@@ -35,6 +35,11 @@ module.exports = function setupMetric (MetricModel, AgentModel) {
     })
   }
 
+  async function findAll () {
+    const result = await MetricModel.findAll() // will be an array of all Project instances
+    return result
+  }
+
   async function create (uuid, metric) {
     const agent = await AgentModel.findOne({
       where: { uuid }
@@ -50,6 +55,7 @@ module.exports = function setupMetric (MetricModel, AgentModel) {
   return {
     create,
     findByAgentUuid,
+    findAll,
     findByTypeAgentUuid
   }
 }

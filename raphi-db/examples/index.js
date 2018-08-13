@@ -11,7 +11,7 @@ async function run () {
     dialect: 'postgres'
   }
 
-  const { Agent, Metric } = await db(config).catch(handleFatalError)
+  const { Agent, Metric, Receptor } = await db(config).catch(handleFatalError)
 
   const agent = await Agent.createOrUpdate({
     uuid: 'wwww',
@@ -33,19 +33,36 @@ async function run () {
   console.log('--metrics--')
   console.log(metrics)
 
+  const metricTotal = await Metric.findAll().catch(handleFatalError) 
+  console.log("--metricsTOTAL--")
+  console.log(metricTotal)
+
   const metric = await Metric.create(agent.uuid, {
     type: 'memory',
-    value: '300'
+    value: '300',
   }).catch(handleFatalError)
-
   console.log('--metric--')
   console.log(metric)
 
-  const metricsByType = await Metric.findByTypeAgentUuid('memory', agent.uuid).catch(handleFatalError)
-  console.log('--metrics--')
-  console.log(metricsByType)
-}
+  /*
+  setInterval(async () => {
+    let aver = await Metric.findByNatureAgentUuid('actuator', agent.uuid).catch(handleFatalError) // y se actualiza ese objeto en la base de datos
+    console.log('--AVEEEEEEEEEEEEEEER--')
+    for (let a of aver) {
+      console.log(a.id)
+    }
+  }, 1000)
+  */
 
+  const metricsByType = await Metric.findByTypeAgentUuid('memory', agent.uuid).catch(handleFatalError)
+  console.log('--metricsByType--')
+  console.log(metricsByType)
+
+  const receptors = await Receptor.findByAgentUuid(agent.uuid).catch(handleFatalError)
+  console.log("----- RECEPTORSSSSSS ------")
+  console.log(receptors)
+
+}
 function handleFatalError (err) {
   console.error(err.message)
   console.error(err.stack)

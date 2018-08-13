@@ -30,7 +30,16 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
     this._timer   = null // referencia del timer inicializada en nulo
     this._client  = null // referencia al cliente MQTT inicializada en null
     this._agentId = null // referencia para el agentId
+    this._receptors = new Map() // inicializar como un Mapa
     this._metrics = new Map() // inicializar como un Mapa
+  }
+
+  addReceptor (name, fn) {
+    this._receptors.set(name, fn) // agrega objetos al Mapa metrics
+  }
+
+  removeMetric (name) {
+    this._receptors.delete(name) // borra objetos del Mapa metrics
   }
 
   addMetric (type, fn) {
@@ -51,15 +60,17 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
       this._client.subscribe('agent/connected') // suscripción del cliente MQTT al evento de "agent/connected" del servidor MQTT para escucharlo
       this._client.subscribe('agent/disconnected') // suscripción del cliente MQTT al evento de "agent/disconnected" del servidor mqtt para escucharlo
       // el objetivo de estas suscripciones es que el servidor MQTT distribuya el objeto agente de un cliente a todos los demás
+      this._client.subscribe('agent/receptors')
 
       this._client.on('connect', () => { // luego de que el cliente MQTT se conecto al servidor MQTT exitosamente ("connect" no es un "evento" ni del servidor ni del cliente, es un evento que avisa q se logró la conexión buena:
         this._agentId = uuid.v4() // se asigna un id al presente agente (cliente MQTT)
 
+        console.log("agent" + this._agentId)
         this.emit('connected', this._agentId) // este es un evento del cliente MQTT PARA SÍ MISMO! Se está creando un emisor de evento "connected" cuando el cliente se cnecta al servidor, esto es para enviar el dato "this._agentId" cuando se implemente un objeto de esta clase con agent.on"connected", cb) (y se ejecute cb(this_agentId)
-
+        let receptorSetted = false
         this._timer = setInterval(async () => {
-          if (this._metrics.size > 0) { // transmitir cuerpo de metricas y agente solo si hay más métricas
-            // inicialización del cuerpo de los objetos agent y metrics!!!:
+          if (this._metrics.size > 0 && this._receptors.size > 0) { // sensors and actuators case
+            console.log("SENSORS AND ACTUATORS")
             let message = {
               agent: {
                 uuid: this._agentId,
@@ -68,6 +79,59 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
                 hostname: os.hostname() || 'localhost',
                 pid: process.pid
               },
+              receptors: [],
+              metrics: [],
+              timestamp: new Date().getTime()
+            }
+
+            for (let [ metric, fn ] of this._metrics) {
+              if (fn.length === 1) { // para hallar el function addity, mediante la propiedad lenght y saber si tiene argumentos; y si tiene solo un argumento es porque es callback
+                fn = util.promisify(fn) // se convierte la función síncrona fn a promesa
+              }
+
+              message.metrics.push({ // agrega al cuerpo de metricas del mensaje, los tipos y valores
+                type: metric,
+                value: await Promise.resolve(fn()) // arroja el valor de la función
+              })
+            }
+
+            console.log("========= RECEPTORSETTED ANTES DEL IF ========")
+            console.log(receptorSetted)
+            if (!receptorSetted) {
+              receptorSetted = await (async () => {
+
+                for (let [ receptor, fn ] of this._receptors) {
+                  if (fn.length === 1) { // para hallar el function addity, mediante la propiedad lenght y saber si tiene argumentos; y si tiene solo un argumento es porque es callback
+                    fn = util.promisify(fn) // se convierte la función síncrona fn a promesa
+                  }
+
+                  message.receptors.push({ // agrega al cuerpo de metricas del mensaje, los tipos y valores
+                    name: receptor,
+                    value: await Promise.resolve(fn()) // arroja el valor de la función
+                  })
+                }
+
+                return true
+              })()
+              console.log("======= RECEPTORSETTED RETORNADO ======")
+              console.log(receptorSetted)
+            }
+
+            debug('Sending', message)
+            this._client.publish('agent/message', JSON.stringify(message)) // se publica el topic "agent/message" con el payload q es string, no olvidar"
+            this.emit('message', message) // este es un evento del cliente MQTT PARA SÍ MISMO!
+ 
+          } else if (this._metrics.size > 0 && this._receptors.size === 0) { // sensors case
+            console.log("SENSORS")
+            let message = {
+              agent: {
+                uuid: this._agentId,
+                username: opts.username,
+                name: opts.name,
+                hostname: os.hostname() || 'localhost',
+                pid: process.pid
+              },
+              receptors: [],
               metrics: [],
               timestamp: new Date().getTime()
             }
@@ -84,10 +148,50 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
             }
 
             debug('Sending', message)
-
             this._client.publish('agent/message', JSON.stringify(message)) // se publica el topic "agent/message" con el payload q es string, no olvidar"
             this.emit('message', message) // este es un evento del cliente MQTT PARA SÍ MISMO!
+
+          } else if (this._metrics.size === 0 && this._receptors.size > 0) { // actuators case
+            console.log("ACTUATORS")
+            let message = {
+              agent: {
+                uuid: this._agentId,
+                username: opts.username,
+                name: opts.name,
+                hostname: os.hostname() || 'localhost',
+                pid: process.pid
+              },
+              receptors: [],
+              metrics: [],
+              timestamp: new Date().getTime()
+            }
+
+            if (!receptorSetted) {
+              receptorSetted = (async () => {
+                for (let [ receptor, fn ] of this._receptors) {
+                  if (fn.length === 1) {
+                    fn = util.promisify(fn)
+                  }
+                  message.receptors.push({
+                    name: receptor,
+                    value: 0 //await Promise.resolve(fn())
+                  })
+                }
+                return true
+              })()
+            }
+
+            debug('Sending', message)
+            this._client.publish('agent/message', JSON.stringify(message)) // se publica el topic "agent/message" con el payload q es string, no olvidar"
+            this.emit('message', message) // este es un evento del cliente MQTT PARA SÍ MISMO!
+          } else {
+            console.log("NO SENSOR NO ACTUATOR")
+            console.log("METRICS")
+            console.log(this._metrics.size)
+            console.log("RECEPTORS")
+            console.log(this._receptors.size)
           }
+
         }, opts.interval) // emite el evento "agent/message" cada tiempo según opts.interval!
       })
 
@@ -102,6 +206,10 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
             // todo evento puede ser escuchado o emitido por este instanciamiento u otros instanciamientos; pero para que este instanciamiento no escuche los eventos "agent/message", "agent/connected", "agent/disconnectes" de SÍ MISMO, se usa el broadcast
             // se hace broadcast si el payload es bueno, contiene info del agente y si el uuid del agente es diferente al id del agente que se acaba de instanciar, broadcast será true
             broadcast = payload && payload.agent && payload.agent.uuid !== this._agentId
+            break
+          case 'agent/receptors':
+            broadcast = payload && payload.agent && payload.agent.uuid == this._agentId
+
             break
         }
 

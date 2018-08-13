@@ -31,7 +31,7 @@ module.exports = {
 
       var options = {
         method: 'GET',
-        url: 'http://192.168.1.8:8080/agent/' + uuid,
+        url: 'http://localhost:8080/agent/' + uuid,
         json: true
       };
 
@@ -56,7 +56,7 @@ module.exports = {
 
       var options = {
         method: 'GET',
-        url: 'http://192.168.1.8:8080/metrics/' + uuid,
+        url: 'http://localhost:8080/metrics/' + uuid,
         json: true
       };
 
@@ -98,9 +98,9 @@ if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-61dee653", __vue__options__)
+    hotAPI.createRecord("data-v-4fa8fc4a", __vue__options__)
   } else {
-    hotAPI.reload("data-v-61dee653", __vue__options__)
+    hotAPI.reload("data-v-4fa8fc4a", __vue__options__)
   }
 })()}
 },{"request-promise-native":383,"vue":471,"vue-hot-reload-api":470}],2:[function(require,module,exports){
@@ -129,7 +129,7 @@ var vm = new Vue({
 
 var request = require('request-promise-native');
 var io = require('socket.io-client');
-var socket = io('http://192.168.1.8:8080');
+var socket = io('http://localhost:8080');
 
 module.exports = {
   data: function data() {
@@ -152,7 +152,7 @@ module.exports = {
 
       var options = {
         method: 'GET',
-        url: 'http://192.168.1.8:8080/agents',
+        url: 'http://localhost:8080/agents',
         json: true
       };
 
@@ -196,9 +196,9 @@ if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-47fcf622", __vue__options__)
+    hotAPI.createRecord("data-v-a3613b12", __vue__options__)
   } else {
-    hotAPI.reload("data-v-47fcf622", __vue__options__)
+    hotAPI.reload("data-v-a3613b12", __vue__options__)
   }
 })()}
 },{"request-promise-native":383,"socket.io-client":406,"vue":471,"vue-hot-reload-api":470}],4:[function(require,module,exports){
@@ -258,7 +258,7 @@ module.exports = {
       this.color = randomColor.getColor();
       var options = {
         method: 'GET',
-        url: 'http://192.168.1.8:8080/metrics/' + uuid + '/' + type,
+        url: 'http://localhost:8080/metrics/' + uuid + '/' + type,
         json: true
       };
       var result = void 0;
@@ -398,9 +398,9 @@ if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-0294885c", __vue__options__)
+    hotAPI.createRecord("data-v-51fc914a", __vue__options__)
   } else {
-    hotAPI.reload("data-v-0294885c", __vue__options__)
+    hotAPI.reload("data-v-51fc914a", __vue__options__)
   }
 })()}
 },{"./line-chart":4,"moment":314,"random-material-color":362,"request-promise-native":383,"vue":471,"vue-hot-reload-api":470}],6:[function(require,module,exports){
@@ -431,7 +431,7 @@ module.exports = {
 
       var options = {
         method: 'GET',
-        url: 'http://192.168.1.8:8080/agent/' + uuid,
+        url: 'http://localhost:8080/agent/' + uuid,
         json: true
       };
 
@@ -459,9 +459,9 @@ if (module.hot) {(function () {  var hotAPI = require("vue-hot-reload-api")
   if (!hotAPI.compatible) return
   module.hot.accept()
   if (!module.hot.data) {
-    hotAPI.createRecord("data-v-7139dbba", __vue__options__)
+    hotAPI.createRecord("data-v-cc9e20aa", __vue__options__)
   } else {
-    hotAPI.reload("data-v-7139dbba", __vue__options__)
+    hotAPI.reload("data-v-cc9e20aa", __vue__options__)
   }
 })()}
 },{"request-promise-native":383,"vue":471,"vue-hot-reload-api":470}],7:[function(require,module,exports){
@@ -40803,7 +40803,7 @@ module.exports={
   "_args": [
     [
       "elliptic@6.4.0",
-      "/home/llaksa/repositories/raphi/raphi-web"
+      "/home/llaksa/repositories/massiot/raphi-web"
     ]
   ],
   "_development": true,
@@ -40829,7 +40829,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/elliptic/-/elliptic-6.4.0.tgz",
   "_spec": "6.4.0",
-  "_where": "/home/llaksa/repositories/raphi/raphi-web",
+  "_where": "/home/llaksa/repositories/massiot/raphi-web",
   "author": {
     "name": "Fedor Indutny",
     "email": "fedor@indutny.com"
@@ -91375,7 +91375,7 @@ module.exports={
   "_args": [
     [
       "tough-cookie@2.3.4",
-      "/home/llaksa/repositories/raphi/raphi-web"
+      "/home/llaksa/repositories/massiot/raphi-web"
     ]
   ],
   "_from": "tough-cookie@2.3.4",
@@ -91400,7 +91400,7 @@ module.exports={
   ],
   "_resolved": "https://registry.npmjs.org/tough-cookie/-/tough-cookie-2.3.4.tgz",
   "_spec": "2.3.4",
-  "_where": "/home/llaksa/repositories/raphi/raphi-web",
+  "_where": "/home/llaksa/repositories/massiot/raphi-web",
   "author": {
     "name": "Jeremy Stashewsky",
     "email": "jstashewsky@salesforce.com"

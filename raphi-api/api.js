@@ -28,7 +28,7 @@ const { auth, db } = {
 }
 */
 
-let services, Agent, Metric
+let services, Agent, Metric, Receptor
 
 api.use('*', async (req, res, next) => {
   if (!services) {
@@ -45,7 +45,7 @@ api.use('*', async (req, res, next) => {
   next()
 })
 
-api.get('/agents', expressAuth(auth), async (req, res, next) => {
+api.get('/agents', expressAuth(myConfigs.auth), async (req, res, next) => {
   debug('A request has come to /agents')
 
   const { user } = req
@@ -87,7 +87,7 @@ api.get('/agent/:uuid', async (req, res, next) => {
   res.send(agent)
 })
 
-api.get('/metrics/:uuid', expressAuth(auth), guard.check(['metrics:read']), async (req, res, next) => {
+api.get('/metrics/:uuid', expressAuth(myConfigs.auth), guard.check(['metrics:read']), async (req, res, next) => {
   const { uuid } = req.params
 
   debug(`request to /metrics/${uuid}`)

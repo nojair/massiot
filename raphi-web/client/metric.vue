@@ -244,7 +244,7 @@ module.exports = {
       this.color = randomColor.getColor()
       const options = {
         method: 'GET',
-        url: `http://192.168.1.8:8080/metrics/${uuid}/${type}`,
+        url: `http://localhost:8080/metrics/${uuid}/${type}`,
         json: true
       }
       let result

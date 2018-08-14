@@ -101,6 +101,8 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
               receptorSetted = await (async () => {
 
                 for (let [ receptor, fn ] of this._receptors) {
+                  console.log("============RECEPTOR=============")
+                  console.log(receptor)
                   if (fn.length === 1) { // para hallar el function addity, mediante la propiedad lenght y saber si tiene argumentos; y si tiene solo un argumento es porque es callback
                     fn = util.promisify(fn) // se convierte la función síncrona fn a promesa
                   }
@@ -111,10 +113,11 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
                   })
                 }
 
+                console.log("MESSAGE==============")
+                console.log(message.receptors)
                 return true
               })()
               console.log("======= RECEPTORSETTED RETORNADO ======")
-              console.log(receptorSetted)
             }
 
             debug('Sending', message)

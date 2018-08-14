@@ -18,15 +18,19 @@ agent.addReceptor('G', () => {
   return Math.random() * 100
 })
 
-agent.addMetric('a', () => {
+agent.addReceptor('a', () => {
   return Math.random() * 100
 })
 
-agent.addMetric('z', () => {
+agent.addMetric('s', () => {
   return Math.random() * 100
 })
 
-agent.addMetric('q', () => {
+agent.addMetric('d', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('f', () => {
   return Math.random() * 100
 })
 

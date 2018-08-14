@@ -172,7 +172,7 @@ api.get('/receptor/update/:uuid/:name/:value', async (req, res, next) => {
 
   let receptor = []
   try {
-    receptor = await Receptor.justUpdate({name: name, value: value}, uuid)
+    receptor = await Receptor.createOrUpdate({name: name, value: value}, uuid)
   } catch (e) {
     return next(e)
   }

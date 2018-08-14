@@ -48,7 +48,7 @@ module.exports = function setupReceptor (ReceptorModel, AgentModel) {
     }
   }
 
-  async function justUpdate(receptor, uuid) {
+  async function createOrUpdate(receptor, uuid) {
     const agent = await AgentModel.findOne({
       where: {
         uuid: uuid
@@ -78,7 +78,7 @@ module.exports = function setupReceptor (ReceptorModel, AgentModel) {
   return {
     create,
     findByAgentUuid,
-    justUpdate,
+    createOrUpdate,
     findAll,
     findByNameAgentUuid
   }

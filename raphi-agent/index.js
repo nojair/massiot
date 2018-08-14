@@ -79,6 +79,7 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
                 hostname: os.hostname() || 'localhost',
                 pid: process.pid
               },
+              caseOption: 1,
               receptors: [],
               metrics: [],
               timestamp: new Date().getTime()
@@ -131,6 +132,7 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
                 hostname: os.hostname() || 'localhost',
                 pid: process.pid
               },
+              caseOption: 2,
               receptors: [],
               metrics: [],
               timestamp: new Date().getTime()
@@ -161,6 +163,7 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
                 hostname: os.hostname() || 'localhost',
                 pid: process.pid
               },
+              caseOption: 3,
               receptors: [],
               metrics: [],
               timestamp: new Date().getTime()
@@ -185,11 +188,22 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
             this._client.publish('agent/message', JSON.stringify(message)) // se publica el topic "agent/message" con el payload q es string, no olvidar"
             this.emit('message', message) // este es un evento del cliente MQTT PARA SÍ MISMO!
           } else {
-            console.log("NO SENSOR NO ACTUATOR")
-            console.log("METRICS")
-            console.log(this._metrics.size)
-            console.log("RECEPTORS")
-            console.log(this._receptors.size)
+            let message = {
+              agent: {
+                uuid: this._agentId,
+                username: opts.username,
+                name: opts.name,
+                hostname: os.hostname() || 'localhost',
+                pid: process.pid
+              },
+              caseOption: 4,
+              receptors: [],
+              metrics: [],
+              timestamp: new Date().getTime()
+            }
+            debug('Sending', message)
+            this._client.publish('agent/message', JSON.stringify(message)) // se publica el topic "agent/message" con el payload q es string, no olvidar"
+            this.emit('message', message) // este es un evento del cliente MQTT PARA SÍ MISMO!
           }
 
         }, opts.interval) // emite el evento "agent/message" cada tiempo según opts.interval!

@@ -1,7 +1,7 @@
 const RaphiAgent = require('../')
 
 const agent = new RaphiAgent({
-  name: 'Lettuce',
+  name: 'Lettuce2',
   username: 'Irvin',
   interval: 2000
 })

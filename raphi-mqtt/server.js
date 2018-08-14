@@ -29,6 +29,7 @@ let Agent, Metric, Receptor // estos servicios se declaran aquí para hacerse gl
 server.on('clientConnected', client => { // evento de MQTT, recibe a un "cliente" (objeto enviado desde un agente)
   debug(`Client Connected: ${client.id}`) // MQTT otorga a ese "cliente" (objeto q recibe) un id específico, NO es el id de nigún agent o metric
   clients.set(client.id, null) // como en este evento no se recibe el mensaje de un emisor de eventos, se setea el client.id a null
+  connectedAgent = true
 })
 
 server.on('clientDisconnected', async (client) => {
@@ -58,7 +59,7 @@ server.on('clientDisconnected', async (client) => {
   }
 })
 
-let firstMessage = false
+let connectedAgent
 let option = 0
 server.on('published', async (packet, client) => { // cuando se publica un mensaje al servidor, este recibe dos objetos (client y packet)
   // packet contiene dos strings: topic (nombre del evento) y payload (cuerpo del mensaje)
@@ -83,14 +84,38 @@ server.on('published', async (packet, client) => { // cuando se publica un mensa
         try {
           agent = await Agent.createOrUpdate(payload.agent)
 
+          option = payload.caseOption
+
           switch (option) {
-            case 1:
-              try {
-                receptors = await Receptor.findByAgentUuid(agent.uuid)
-              } catch (e) {
-                return handleError.simple(e)
+            case 1: // SENSORS AND ACTUATORS
+
+              console.log("==================== PAYLOAD =======================")
+              console.log(payload)
+              if (payload.receptors.length) {
+                receptors = payload.receptors
+                for (let receptor of receptors) { // recordar que el payload ya es solo un objeto de javascript con objetos agent y metrics
+                  // se usa for - of porque soporta async await!, lo cual no sucede con foreach!
+
+                  let r
+
+                  try {
+                    r = await Receptor.create(agent.uuid, receptor)
+                  } catch (e) {
+                    return handleError.simple(e)
+                  }
+
+                  debug(`Receptor ${r.id} saved on agent ${agent.uuid}`)
+                }
+              } else {
+                try {
+                  receptors = await Receptor.findByAgentUuid(agent.uuid)
+                  console.log("================ RECEPTORS =================")
+                  console.log(receptors)
+                } catch (e) {
+                  return handleError.simple(e)
+                }
+                debug(`ReceptorES ${receptors} founded in agent ${agent.uuid}`)
               }
-              debug(`ReceptorES ${receptors} founded in agent ${agent.uuid}`)
 
               // Store Metrics
               for (let metric of payload.metrics) { // recordar que el payload ya es solo un objeto de javascript con objetos agent y metrics
@@ -107,9 +132,8 @@ server.on('published', async (packet, client) => { // cuando se publica un mensa
               }
               break
 
-            case 2:
-              receptors = {}
-              debug(`ReceptorES ${receptors} NOT founded in agent ${agent.uuid}`)
+            case 2: // SENSORS
+              debug(`Just sensors case in agent ${agent.uuid}`)
 
               // Store Metrics
               for (let metric of payload.metrics) { // recordar que el payload ya es solo un objeto de javascript con objetos agent y metrics
@@ -126,104 +150,47 @@ server.on('published', async (packet, client) => { // cuando se publica un mensa
               }
               break
 
-            case 3:
+            case 3: // ACTUATORS
+              debug(`Just Actuators case in agent ${agent.uuid}`)
+              if (payload.receptors.length) {
+                receptors = payload.receptors
+              } else {
+                try {
+                  receptors = await Receptor.findByAgentUuid(agent.uuid)
+                } catch (e) {
+                  return handleError.simple(e)
+                }
+              }
+
+              for (let receptor of receptors) { // recordar que el payload ya es solo un objeto de javascript con objetos agent y metrics
+                // se usa for - of porque soporta async await!, lo cual no sucede con foreach!
+
+                let r
+
+                try {
+                  r = await Receptor.createOrUpdate(agent.uuid, receptor)
+                } catch (e) {
+                  return handleError.simple(e)
+                }
+
+                debug(`Receptor ${r.id} now on agent ${agent.uuid}`)
+              }
+              break
+
+            case 4: // NON CASE
               try {
                 receptors = await Receptor.findByAgentUuid(agent.uuid)
               } catch (e) {
                 return handleError.simple(e)
               }
-              debug(`ReceptorES ${receptors} founded in agent ${agent.uuid}`)
-              debug(`Metric NOT founded in agent ${agent.uuid}`)
-              break
-
-            case 4:
-              receptors = {}
+              debug(`ReceptorS ${receptors} founded in agent ${agent.uuid}`)
               break
           }
 
-          if (!firstMessage) {
-            if (payload.metrics.length > 0 && payload.receptors.length > 0) { // SENSORS AND ACTUATORS
-              option = 1
-              firstMessage = true
-              receptors = payload.receptors
-              for (let receptor of receptors) { // recordar que el payload ya es solo un objeto de javascript con objetos agent y metrics
-                // se usa for - of porque soporta async await!, lo cual no sucede con foreach!
-
-                let r
-
-                try {
-                  r = await Receptor.create(agent.uuid, receptor)
-                } catch (e) {
-                  return handleError.simple(e)
-                }
-
-                debug(`Receptor ${r.id} saved on agent ${agent.uuid}`)
-              }
-
-              // Store Metrics
-              for (let metric of payload.metrics) { // recordar que el payload ya es solo un objeto de javascript con objetos agent y metrics
-                // se usa for - of porque soporta async await!, lo cual no sucede con foreach!
-                let m
-
-                try {
-                  m = await Metric.create(agent.uuid, metric)
-                } catch (e) {
-                  return handleError.simple(e)
-                }
-
-                debug(`Metric ${m.id} saved on agent ${agent.uuid}`)
-              }
-
-            } else if (payload.metrics.length > 0 && payload.receptors.length === 0) { // SENSORS
-              option = 2
-              firstMessage = true
-              receptors = {}
-              debug(`ReceptorES ${receptors} NOT founded in agent ${agent.uuid}`)
-
-              // Store Metrics
-              for (let metric of payload.metrics) { // recordar que el payload ya es solo un objeto de javascript con objetos agent y metrics
-                // se usa for - of porque soporta async await!, lo cual no sucede con foreach!
-                let m
-
-                try {
-                  m = await Metric.create(agent.uuid, metric)
-                } catch (e) {
-                  return handleError.simple(e)
-                }
-
-                debug(`Metric ${m.id} saved on agent ${agent.uuid}`)
-              }
-
-            } else if (payload.metrics.length === 0 && payload.receptors.length > 0) { // ACTUATORS
-              option = 3
-              firstMessage = true
-              receptors = payload.receptors
-              for (let receptor of receptors) { // recordar que el payload ya es solo un objeto de javascript con objetos agent y metrics
-                // se usa for - of porque soporta async await!, lo cual no sucede con foreach!
-
-                let r
-
-                try {
-                  r = await Receptor.create(agent.uuid, receptor)
-                } catch (e) {
-                  return handleError.simple(e)
-                }
-
-                debug(`Receptor ${r.id} saved on agent ${agent.uuid}`)
-              }
-              debug(`Metric NOT found in this case: agent ${agent.uuid}`)
-
-            } else {
-              option = 4
-              firstMessage = true
-              receptors = {}
-            }
+        } catch (e) {
+          // si hay algun error lo maneja y continua
+          return handleError.simple(e)
         }
-
-      } catch (e) {
-        // si hay algun error lo maneja y continua
-        return handleError.simple(e)
-      }
 
       debug(`Agent ${agent.uuid} saved`)
 
@@ -232,7 +199,7 @@ server.on('published', async (packet, client) => { // cuando se publica un mensa
         clients.set(client.id, agent) // se setea client.id para que ahora apunte al objeto agent y todo esto se guarde en el mapa CLIENTS y
 
           server.publish({ // se le pide al servidor publicar dos mensajes STRING: un topic y un payload (este es un payload distinto al de más arriba obvio!!! -.- )
-            topic: 'agent/connected', 
+            topic: 'agent/connected',
             payload: JSON.stringify({
               agent: {
                 uuid: agent.uuid,

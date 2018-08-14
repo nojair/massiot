@@ -18,6 +18,22 @@ agent.addReceptor('G', () => {
   return Math.random() * 100
 })
 
+agent.addReceptor('a', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('s', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('d', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('f', () => {
+  return Math.random() * 100
+})
+
 agent.connect()
 
 /*

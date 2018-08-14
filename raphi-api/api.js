@@ -39,8 +39,9 @@ api.use('*', async (req, res, next) => {
       return next(e)
     }
 
-    Agent  = services.Agent
-    Metric = services.Metric
+    Agent    = services.Agent
+    Metric   = services.Metric
+    Receptor = services.Receptor
   }
   next()
 })
@@ -123,6 +124,64 @@ api.get('/metrics/:uuid/:type', async (req, res, next) => {
   }
 
   res.send(metrics)
+})
+
+api.get('/receptors/:uuid', expressAuth(myConfigs.auth), guard.check(['receptors:read']), async (req, res, next) => {
+  const { uuid } = req.params
+
+  debug(`request to /receptors/${uuid}`)
+
+  let receptors = []
+  try {
+    receptors = await Receptor.findByAgentUuid(uuid)
+  } catch (e) {
+    return next(e)
+  }
+
+  if (!receptors || receptors.length === 0) {
+    return next(new Error(`Receptor not found for agent with uuid ${uuid}`))
+  }
+
+  res.send(receptors)
+})
+
+api.get('/receptors/:uuid/:name', async (req, res, next) => {
+  const { uuid, name } = req.params
+
+  debug(`request to /receptors/${uuid}/${name}`)
+
+  let receptors = []
+  try {
+    receptors = await Receptor.findByNameAgentUuid(name, uuid)
+  } catch (e) {
+    return next(e)
+  }
+
+  if (!receptors || receptors.length === 0) {
+    return next(new Error(`Receptors (${name}) not found for agent with uuid ${uuid}`))
+  }
+
+  res.send(receptors)
+})
+
+// CHange the follow route to a POST method in the future
+api.get('/receptor/update/:uuid/:name/:value', async (req, res, next) => {
+  const { uuid, name, value } = req.params
+
+  debug(`request to /receptor/${uuid}/${name}/${value}`)
+
+  let receptor = []
+  try {
+    receptor = await Receptor.justUpdate({name: name, value: value}, uuid)
+  } catch (e) {
+    return next(e)
+  }
+
+  if (!receptor || receptor.length === 0) {
+    return next(new Error(`Receptor (${name}) doesn't actualized for agent with uuid ${uuid} with value ${value}`))
+  }
+
+  res.send(receptor)
 })
 
 module.exports = api

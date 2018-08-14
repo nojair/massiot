@@ -3,6 +3,7 @@
 module.exports = function setupReceptor (ReceptorModel, AgentModel) {
   async function findByAgentUuid (uuid) {
     return ReceptorModel.findAll({
+      attributes: [ 'name', 'value' ],
       include: [{
         attributes: [],
         model: AgentModel,
@@ -16,8 +17,7 @@ module.exports = function setupReceptor (ReceptorModel, AgentModel) {
 
   async function findByNameAgentUuid (name, uuid) {
     return ReceptorModel.findAll({
-      attributes: [ 'id', 'name', 'value', 'createdAt' ],
-      group: [ 'name' ],
+      attributes: [ 'id', 'name', 'value' ],
       limit: 20,
       order: [[ 'createdAt', 'DESC' ]],
       include: [{
@@ -48,26 +48,37 @@ module.exports = function setupReceptor (ReceptorModel, AgentModel) {
     }
   }
 
-  async function settingPoint (value, name, uuid) {
+  async function justUpdate(receptor, uuid) {
     const agent = await AgentModel.findOne({
-      where: { uuid }
+      where: {
+        uuid: uuid
+      }
     })
 
-    const receptor = await ReceptorModel.findOne({
-      where: { agentId: agent.Id }
-    })
-
-    if (receptor) {
-      Object.assign(receptor, { value: value, name: name })
-      const result = await ReceptorModel.update(receptor)
-      return result.toJSON()
+    const cond = {
+      where: {
+        agentId: agent.id,
+        name: receptor.name
+      }
     }
+
+    const existingReceptor = await ReceptorModel.findOne(cond)
+
+    console.log("==================JUSTUPDATE======================")
+    console.log(cond)
+    if (existingReceptor) {
+      const updated = await ReceptorModel.update(receptor, cond)
+      return updated ? ReceptorModel.findOne(cond) : existingReceptor
+    }
+
+    const result = await ReceptorModel.create(receptor)
+    return result.toJSON()
   }
 
   return {
     create,
     findByAgentUuid,
-    settingPoint,
+    justUpdate,
     findAll,
     findByNameAgentUuid
   }

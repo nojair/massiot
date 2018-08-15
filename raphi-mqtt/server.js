@@ -29,7 +29,6 @@ let Agent, Metric, Receptor // estos servicios se declaran aquí para hacerse gl
 server.on('clientConnected', client => { // evento de MQTT, recibe a un "cliente" (objeto enviado desde un agente)
   debug(`Client Connected: ${client.id}`) // MQTT otorga a ese "cliente" (objeto q recibe) un id específico, NO es el id de nigún agent o metric
   clients.set(client.id, null) // como en este evento no se recibe el mensaje de un emisor de eventos, se setea el client.id a null
-  connectedAgent = true
 })
 
 server.on('clientDisconnected', async (client) => {
@@ -59,7 +58,6 @@ server.on('clientDisconnected', async (client) => {
   }
 })
 
-let connectedAgent
 let option = 0
 server.on('published', async (packet, client) => { // cuando se publica un mensaje al servidor, este recibe dos objetos (client y packet)
   // packet contiene dos strings: topic (nombre del evento) y payload (cuerpo del mensaje)
@@ -88,9 +86,6 @@ server.on('published', async (packet, client) => { // cuando se publica un mensa
 
           switch (option) {
             case 1: // SENSORS AND ACTUATORS
-
-              console.log("==================== PAYLOAD =======================")
-              console.log(payload)
               if (payload.receptors.length) {
                 receptors = payload.receptors
                 for (let receptor of receptors) { // recordar que el payload ya es solo un objeto de javascript con objetos agent y metrics

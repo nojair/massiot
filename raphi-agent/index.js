@@ -65,7 +65,6 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
       this._client.on('connect', () => { // luego de que el cliente MQTT se conecto al servidor MQTT exitosamente ("connect" no es un "evento" ni del servidor ni del cliente, es un evento que avisa q se logró la conexión buena:
         this._agentId = uuid.v4() // se asigna un id al presente agente (cliente MQTT)
 
-        console.log("agent" + this._agentId)
         this.emit('connected', this._agentId) // este es un evento del cliente MQTT PARA SÍ MISMO! Se está creando un emisor de evento "connected" cuando el cliente se cnecta al servidor, esto es para enviar el dato "this._agentId" cuando se implemente un objeto de esta clase con agent.on"connected", cb) (y se ejecute cb(this_agentId)
         let receptorSetted = false
         this._timer = setInterval(async () => {
@@ -96,8 +95,6 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
               })
             }
 
-            console.log("========= RECEPTORSETTED ANTES DEL IF ========")
-            console.log(receptorSetted)
             if (!receptorSetted) {
               receptorSetted = await (async () => {
 
@@ -114,8 +111,6 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
 
                 return true
               })()
-              console.log("======= RECEPTORSETTED RETORNADO ======")
-              console.log(receptorSetted)
             }
 
             debug('Sending', message)

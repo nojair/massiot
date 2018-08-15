@@ -18,6 +18,10 @@ agent.addReceptor('G', () => {
   return Math.random() * 100
 })
 
+agent.addMetric('q', () => {
+  return Math.random() * 100
+})
+
 agent.addMetric('a', () => {
   return Math.random() * 100
 })
@@ -26,7 +30,27 @@ agent.addMetric('z', () => {
   return Math.random() * 100
 })
 
-agent.addMetric('q', () => {
+agent.addMetric('w', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('s', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('x', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('e', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('d', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('c', () => {
   return Math.random() * 100
 })
 

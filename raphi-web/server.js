@@ -25,6 +25,8 @@ app.use(cors())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use('/', proxy)
 
+//agent.on('agent/connected', (p) => {console.log(p)})
+
 // Socket.io / WebSockets
 io.on('connect', socket => {
   debug(`Connected ${socket.id}`)

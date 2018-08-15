@@ -182,7 +182,8 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
             debug('Sending', message)
             this._client.publish('agent/message', JSON.stringify(message)) // se publica el topic "agent/message" con el payload q es string, no olvidar"
             this.emit('message', message) // este es un evento del cliente MQTT PARA SÍ MISMO!
-          } else {
+          } else { // web server
+            /*
             let message = {
               agent: {
                 uuid: this._agentId,
@@ -199,6 +200,7 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
             debug('Sending', message)
             this._client.publish('agent/message', JSON.stringify(message)) // se publica el topic "agent/message" con el payload q es string, no olvidar"
             this.emit('message', message) // este es un evento del cliente MQTT PARA SÍ MISMO!
+            */
           }
 
         }, opts.interval) // emite el evento "agent/message" cada tiempo según opts.interval!
@@ -216,9 +218,9 @@ class RaphiAgent extends EventEmitter { // el agente raphi-agent se extiende de 
             // se hace broadcast si el payload es bueno, contiene info del agente y si el uuid del agente es diferente al id del agente que se acaba de instanciar, broadcast será true
             broadcast = payload && payload.agent && payload.agent.uuid !== this._agentId
             break
+
           case 'agent/receptors':
             broadcast = payload && payload.agent && payload.agent.uuid == this._agentId
-
             break
         }
 

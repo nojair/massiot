@@ -1,7 +1,7 @@
 <template>
   <div class="column is-one-quarter">
     
-    <div v-if="type === 'AirTemperature'" class="card">
+    <div v-if="type === 'a'" class="card">
       <br/>
       <div v-on:click="classIsActive" class="modal-button card-image is-flex is-horizontal-centered">
         <figure class="image is-128x128">
@@ -23,7 +23,7 @@
       </div>
     </div>
     
-    <div v-else-if="type === 'TankLevel'" class="card">
+    <div v-else-if="type === 'q'" class="card">
       <br/>
       <div v-on:click="classIsActive" class="modal-button card-image is-flex is-horizontal-centered">
         <figure class="image is-128x128">
@@ -45,7 +45,7 @@
       </div>
     </div>
 
-    <div v-else-if="type === 'LightIntensity'" class="card">
+    <div v-else-if="type === 'z'" class="card">
       <br/>
       <div v-on:click="classIsActive" class="modal-button card-image is-flex is-horizontal-centered">
         <figure class="image is-128x128">
@@ -67,7 +67,7 @@
       </div>
     </div>
 
-    <div v-else-if="type === 'FreshAir'" class="card">
+    <div v-else-if="type === 'w'" class="card">
       <br/>
       <div v-on:click="classIsActive" class="modal-button card-image is-flex is-horizontal-centered">
         <figure class="image is-128x128">
@@ -92,7 +92,7 @@
       </div>
     </div>
 
-    <div class="card" v-else-if="type === 'FreshNutriSol'">
+    <div class="card" v-else-if="type === 's'">
       <br/>
       <div v-on:click="classIsActive" class="modal-button card-image is-flex is-horizontal-centered">
         <figure class="image is-128x128">
@@ -117,7 +117,7 @@
       </div>
     </div>
     
-    <div class="card" v-else-if="type === 'AirCirculation'">
+    <div class="card" v-else-if="type === 'x'">
       <br/>
       <div v-on:click="classIsActive" class="modal-button card-image is-flex is-horizontal-centered">
         <figure class="image is-128x128">
@@ -142,7 +142,7 @@
       </div>
     </div>
     
-    <div class="card" v-else-if="type === 'NutriSolCirculation'">
+    <div class="card" v-else-if="type === 'e'">
       <br/>
       <div v-on:click="classIsActive" class="modal-button card-image is-flex is-horizontal-centered">
         <figure class="image is-128x128">
@@ -167,7 +167,7 @@
       </div>
     </div>
     
-    <div class="card" v-else-if="type === 'NutriSolTemperature'">
+    <div class="card" v-else-if="type === 'd'">
       <br/>
       <div v-on:click="classIsActive" class="modal-button card-image is-flex is-horizontal-centered">
         <figure class="image is-128x128">
@@ -181,7 +181,7 @@
       </div>
     </div>
     
-    <div class="card" v-else-if="type === 'OxygenMonoxide'">
+    <div class="card" v-else-if="type === 'c'">
       <br/>
       <div v-on:click="classIsActive" class="modal-button card-image is-flex is-horizontal-centered">
         <figure class="image is-128x128">

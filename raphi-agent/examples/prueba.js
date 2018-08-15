@@ -6,15 +6,19 @@ const agent = new RaphiAgent({
   interval: 2000
 })
 
+agent.addReceptor('A', () => {
+  return Math.random() * 100
+})
+
 agent.addReceptor('B', () => {
   return Math.random() * 100
 })
 
-agent.addReceptor('D', () => {
+agent.addReceptor('C', () => {
   return Math.random() * 100
 })
 
-agent.addReceptor('G', () => {
+agent.addMetric('q', () => {
   return Math.random() * 100
 })
 
@@ -26,7 +30,27 @@ agent.addMetric('z', () => {
   return Math.random() * 100
 })
 
-agent.addMetric('q', () => {
+agent.addMetric('w', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('s', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('x', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('e', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('c', () => {
+  return Math.random() * 100
+})
+
+agent.addMetric('d', () => {
   return Math.random() * 100
 })
 

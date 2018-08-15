@@ -82,6 +82,26 @@ server.on('published', async (packet, client) => { // cuando se publica un mensa
         try {
           agent = await Agent.createOrUpdate(payload.agent)
 
+          debug(`Agent ${agent.uuid} saved`)
+
+          // Notify Agent is Connected
+          if (!clients.get(client.id)) { // si el cliente creado por MQTT (asociado a client.id) es distinto a null
+            clients.set(client.id, agent) // se setea client.id para que ahora apunte al objeto agent y todo esto se guarde en el mapa CLIENTS y
+
+            server.publish({ // se le pide al servidor publicar dos mensajes STRING: un topic y un paylo w-ad (este es un payload distinto al de más arriba obvio!!! -.- )
+              topic: 'agent/connected',
+              payload: JSON.stringify({
+                agent: {
+                  uuid: agent.uuid,
+                  name: agent.name,
+                  hostname: agent.hostname,
+                  pid: agent.pid,
+                  connected: agent.connected
+                }
+              })
+            }) // y así se logra recibir un topic y un payload de un agente y luego se envía un topic y un payload a los clientes MQTT suscritos y conectados
+          }
+
           option = payload.caseOption
 
           switch (option) {
@@ -173,38 +193,12 @@ server.on('published', async (packet, client) => { // cuando se publica un mensa
               break
 
             case 4: // NON CASE
-              try {
-                receptors = await Receptor.findByAgentUuid(agent.uuid)
-              } catch (e) {
-                return handleError.simple(e)
-              }
-              debug(`ReceptorS ${receptors} founded in agent ${agent.uuid}`)
               break
           }
 
         } catch (e) {
           // si hay algun error lo maneja y continua
           return handleError.simple(e)
-        }
-
-      debug(`Agent ${agent.uuid} saved`)
-
-      // Notify Agent is Connected
-      if (!clients.get(client.id)) { // si el cliente creado por MQTT (asociado a client.id) es distinto a null
-        clients.set(client.id, agent) // se setea client.id para que ahora apunte al objeto agent y todo esto se guarde en el mapa CLIENTS y
-
-          server.publish({ // se le pide al servidor publicar dos mensajes STRING: un topic y un payload (este es un payload distinto al de más arriba obvio!!! -.- )
-            topic: 'agent/connected',
-            payload: JSON.stringify({
-              agent: {
-                uuid: agent.uuid,
-                name: agent.name,
-                hostname: agent.hostname,
-                pid: agent.pid,
-                connected: agent.connected
-              }
-            })
-          }) // y así se logra recibir un topic y un payload de un agente y luego se envía un topic y un payload a los clientes MQTT suscritos y conectados
         }
 
       }
